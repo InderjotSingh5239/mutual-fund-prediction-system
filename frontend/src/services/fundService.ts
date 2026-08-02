@@ -1,11 +1,10 @@
+import { MUTUAL_FUNDS, getFundById } from '@/data/mutualFunds'
 import type { MutualFund, FundCategory, AMC, RiskLevel } from '@/types/fund'
 import type { ApiMutualFundDetail, ApiMutualFundListResponse } from '@/types/api'
 import { apiClient, isBackendConfigured } from '@/api/client'
 import { adaptApiFund, adaptApiFundDetail } from '@/services/fundAdapter'
 
 const NETWORK_DELAY = 400
-const response = await api.get("/funds");
-return response.data;
 function delay<T>(value: T, ms = NETWORK_DELAY): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms))
 }
@@ -103,16 +102,38 @@ function fetchFundsFromMock(filters: FundFilters): Promise<PaginatedFunds> {
   return delay({ funds: paged, total, page, pageSize, totalPages })
 }
 
-export async function fetchFunds(filters: FundFilters = {}): Promise<PaginatedFunds> {
-  return isBackendConfigured ? fetchFundsFromApi(filters) : fetchFundsFromMock(filters)
+export async function fetchFunds(
+  filters: FundFilters = {}
+): Promise<PaginatedFunds> {
+
+  if (!isBackendConfigured) {
+    return fetchFundsFromMock(filters)
+  }
+
+  try {
+    return await fetchFundsFromApi(filters)
+  } catch (error) {
+    console.error("Backend Error:", error)
+
+    throw error
+  }
 }
 
-export async function fetchFundById(id: string): Promise<MutualFund | undefined> {
-  if (isBackendConfigured) {
+export async function fetchFundById(
+  id: string
+): Promise<MutualFund | undefined> {
+
+  if (!isBackendConfigured) {
+    return delay(getFundById(id))
+  }
+
+  try {
     const { data } = await apiClient.get<ApiMutualFundDetail>(`/funds/${id}`)
     return adaptApiFundDetail(data)
+  } catch (error) {
+    console.error(error)
+    throw error
   }
-  return delay(getFundById(id))
 }
 
 /**
