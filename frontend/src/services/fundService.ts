@@ -1,11 +1,11 @@
-import { MUTUAL_FUNDS, getFundById } from '@/data/mockFunds'
 import type { MutualFund, FundCategory, AMC, RiskLevel } from '@/types/fund'
 import type { ApiMutualFundDetail, ApiMutualFundListResponse } from '@/types/api'
 import { apiClient, isBackendConfigured } from '@/api/client'
 import { adaptApiFund, adaptApiFundDetail } from '@/services/fundAdapter'
 
 const NETWORK_DELAY = 400
-
+const response = await api.get("/funds");
+return response.data;
 function delay<T>(value: T, ms = NETWORK_DELAY): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms))
 }
