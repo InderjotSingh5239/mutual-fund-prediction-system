@@ -5,24 +5,39 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { AllocationDonut } from '@/components/charts/AllocationDonut'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
+import { useEffect } from 'react'
+import { calculateLumpsum } from '@/services/calculatorService'
 
-function calculateLumpsum(principal: number, years: number, annualReturn: number) {
-  const r = annualReturn / 100
-  const series: { year: number; value: number }[] = [{ year: 0, value: principal }]
-  for (let y = 1; y <= years; y++) {
-    series.push({ year: y, value: Math.round(principal * Math.pow(1 + r, y)) })
-  }
-  const maturity = series[series.length - 1].value
-  return { invested: principal, maturity, returns: maturity - principal, series }
-}
+
 
 export default function LumpsumCalculator() {
   const [principal, setPrincipal] = useState(100000)
   const [years, setYears] = useState(10)
   const [annualReturn, setAnnualReturn] = useState(12)
 
-  const result = useMemo(() => calculateLumpsum(principal, years, annualReturn), [principal, years, annualReturn])
+  const [result, setResult] = useState<any>(null)
 
+useEffect(() => {
+    calculateLumpsum({
+        principal,
+        duration_years: years,
+        expected_annual_return_percent: annualReturn,
+        inflation_percent: 0,
+    }).then((res) => {
+        setResult({
+            invested: res.principal,
+            maturity: res.maturity_value,
+            returns: res.estimated_returns,
+            series: res.yearly_breakdown.map((item: any) => ({
+                year: item.year,
+                value: item.value,
+            })),
+        })
+    })
+}, [principal, years, annualReturn])
+  if (!result) {
+    return <div>Loading...</div>
+}
   return (
     <div className="space-y-6">
       <div>
