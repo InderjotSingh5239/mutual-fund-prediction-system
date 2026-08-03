@@ -1,5 +1,4 @@
-import { generatePrediction } from '@/data/predictionEngine'
-import { getFundById } from '@/data/mockFunds'
+
 import type { PredictionHorizon, PredictionResult } from '@/types/fund'
 import type { ApiPredictionListResponse } from '@/types/api'
 import { apiClient, isBackendConfigured } from '@/api/client'
@@ -45,12 +44,8 @@ export async function requestPrediction(
   fundId: string,
   horizon: PredictionHorizon
 ): Promise<PredictionResult> {
-  if (isBackendConfigured) {
-    return requestPredictionFromApi(fundId, horizon)
-  }
 
-  const fund = getFundById(fundId)
-  if (!fund) throw new Error('Fund not found')
-  const result = generatePrediction(fund, horizon)
-  return delay(result, 1600)
+  return requestPredictionFromApi(fundId, horizon)
+
 }
+
