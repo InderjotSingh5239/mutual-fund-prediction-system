@@ -46,9 +46,14 @@ export default function Dashboard() {
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={Wallet} label="Portfolio Value" value="₹4,82,650" delta="+3.2%" positive accent="emerald" />
-        <StatCard icon={Activity} label="Total Funds Tracked" <CardDescription>
-  {benchmarkFund?.name ?? "Loading..."} · {benchmarkFund?.benchmark ?? ""}
-</CardDescription> delta="+2 this month" positive accent="blue" />
+        <StatCard
+  icon={Activity}
+  label="Total Funds Tracked"
+  value={trending?.length?.toString() ?? "0"}
+  delta="+2 this month"
+  positive
+  accent="blue"
+/>
         <StatCard icon={TrendingUp} label="Top Category CAGR" value="26.7%" delta="Small Cap" positive accent="emerald" />
         <StatCard icon={TrendingDown} label="Avg. Expense Ratio" value="0.58%" delta="-0.03%" positive accent="amber" />
       </div>
@@ -64,10 +69,10 @@ export default function Dashboard() {
   {benchmarkFund?.name ?? "Loading..."} · {benchmarkFund?.benchmark ?? ""}
 </CardDescription>
               </div>
-              <Badge variant="emerald">{formatPercent(benchmarkFund? .navChangePercent ?? 0)}</Badge>
+              <Badge variant="emerald">{formatPercent(benchmarkFund?.navChangePercent ?? 0)}</Badge>
             </CardHeader>
             <CardContent>
-              <NavHistoryChart data={benchmarkFund? .navHistory} showMovingAverages />
+              <NavHistoryChart data={benchmarkFund?.navHistory} showMovingAverages />
             </CardContent>
           </Card>
 
