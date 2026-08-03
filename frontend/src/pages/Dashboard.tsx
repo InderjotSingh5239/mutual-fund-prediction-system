@@ -9,7 +9,6 @@ import { FundRow } from '@/components/common/FundRow'
 import { FundCard } from '@/components/common/FundCard'
 import { Loader } from '@/components/common/Loader'
 import { NavHistoryChart } from '@/components/charts/NavHistoryChart'
-import { getTopFunds } from '@/services/fundService'
 import { useTopGainers, useTopLosers, useTrendingFunds } from '@/hooks/useFunds'
 import { formatPercent } from '@/lib/utils'
 
@@ -20,12 +19,11 @@ const RECENT_ACTIVITY = [
   { id: 4, action: 'Lumpsum invested', fund: 'HDFC Top 100 Fund', amount: '₹25,000', time: '2d ago' },
 ]
 
-const { data: AI_PICKS = [], isLoading: loadingAIPicks } = getTopFunds()
-
 export default function Dashboard() {
   const { data: gainers, isLoading: loadingGainers } = useTopGainers(4)
   const { data: losers, isLoading: loadingLosers } = useTopLosers(4)
   const { data: trending, isLoading: loadingTrending } = useTrendingFunds(3)
+  const { data: AI_PICKS = [], isLoading: loadingAIPicks } = useTrendingFunds(6)
 
   const benchmarkFund = trending?.[0]
 
