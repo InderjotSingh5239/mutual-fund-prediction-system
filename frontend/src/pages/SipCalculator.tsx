@@ -1,35 +1,31 @@
 import { useEffect } from 'react'
 import { calculateSip } from '@/services/calculatorService'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { AllocationDonut } from '@/components/charts/AllocationDonut'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
 import { Link } from 'react-router-dom'
-useEffect(() => {
-
-    calculateSip({
-        monthly_investment: monthly,
-        duration_years: years,
-        expected_annual_return_percent: annualReturn,
-        step_up_percent:0,
-        inflation_percent:0
-    }).then(setResult)
-
-},[
-monthly,
-years,
-annualReturn
-])
-const [result, setResult] = useState<any>(null)
 
 
 export default function SipCalculator() {
   const [monthly, setMonthly] = useState(10000)
   const [years, setYears] = useState(15)
   const [annualReturn, setAnnualReturn] = useState(12)
+  const [result, setResult] = useState<any>(null)
 
+useEffect(() => {
+  calculateSip({
+    monthly_investment: monthly,
+    duration_years: years,
+    expected_annual_return_percent: annualReturn,
+    step_up_percent: 0,
+    inflation_percent: 0,
+  })
+    .then(setResult)
+    .catch(console.error)
+}, [monthly, years, annualReturn])
 
   return (
     <div className="space-y-6">
@@ -62,19 +58,19 @@ export default function SipCalculator() {
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Invested Amount</p>
-                <p className="text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">{formatCurrency(result.invested, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">{formatCurrency(result?.total_invested ?? 0, true)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Estimated Returns</p>
-                <p className="text-2xl font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(result.returns, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(result?.estimated_returns ?? 0, true)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Total Value</p>
-                <p className="text-2xl font-mono-data font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(result.maturity, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(result?.maturity_value ?? 0, true)}</p>
               </CardContent>
             </Card>
           </div>
@@ -86,7 +82,7 @@ export default function SipCalculator() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={result.series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <AreaChart data={result?.yearly_breakdown ?? []} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="sipValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#2f6fed" stopOpacity={0.3} />
@@ -101,8 +97,8 @@ export default function SipCalculator() {
                   <XAxis dataKey="year" tickFormatter={(v) => `Y${v}`} tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} tickFormatter={(v) => formatCurrency(v, true)} axisLine={false} tickLine={false} width={64} />
                   <Tooltip formatter={(v) => formatCurrency(chartValueToNumber(v))} labelFormatter={(v) => `Year ${v}`} />
-                  <Area type="monotone" dataKey="value" name="Projected Value" stroke="#2f6fed" fill="url(#sipValue)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="invested" name="Invested" stroke="#64748b" fill="url(#sipInvested)" strokeWidth={1.5} />
+                  <Area type="monotone" dataKey="corpus_value" name="Projected Value" stroke="#2f6fed" fill="url(#sipValue)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="total_invested_so_far" name="Invested" stroke="#64748b" fill="url(#sipInvested)" strokeWidth={1.5} />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -115,8 +111,8 @@ export default function SipCalculator() {
             <CardContent>
               <AllocationDonut
                 data={[
-                  { name: 'Invested', value: result.invested },
-                  { name: 'Returns', value: result.returns },
+                  { name: 'Invested', value: result?.total_invested ?? 0 },
+                  { name: 'Returns', value: result?.estimated_returns ?? 0 },
                 ]}
                 height={200}
               />
