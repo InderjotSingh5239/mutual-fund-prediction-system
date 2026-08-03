@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { calculateSip } from '@/services/calculatorService'
 import { useMemo, useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -5,28 +7,29 @@ import { AllocationDonut } from '@/components/charts/AllocationDonut'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
 import { Link } from 'react-router-dom'
+useEffect(() => {
 
-function calculateSip(monthly: number, years: number, annualReturn: number) {
-  const months = years * 12
-  const r = annualReturn / 100 / 12
-  const series: { year: number; invested: number; value: number }[] = []
-  let value = 0
-  for (let m = 1; m <= months; m++) {
-    value = (value + monthly) * (1 + r)
-    if (m % 12 === 0) {
-      series.push({ year: m / 12, invested: monthly * m, value: Math.round(value) })
-    }
-  }
-  const invested = monthly * months
-  return { invested, maturity: Math.round(value), returns: Math.round(value - invested), series }
-}
+    calculateSip({
+        monthly_investment: monthly,
+        duration_years: years,
+        expected_annual_return_percent: annualReturn,
+        step_up_percent:0,
+        inflation_percent:0
+    }).then(setResult)
+
+},[
+monthly,
+years,
+annualReturn
+])
+const [result, setResult] = useState<any>(null)
+
 
 export default function SipCalculator() {
   const [monthly, setMonthly] = useState(10000)
   const [years, setYears] = useState(15)
   const [annualReturn, setAnnualReturn] = useState(12)
 
-  const result = useMemo(() => calculateSip(monthly, years, annualReturn), [monthly, years, annualReturn])
 
   return (
     <div className="space-y-6">
