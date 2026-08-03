@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -23,7 +23,7 @@ useEffect(() => {
         duration_years: years,
         expected_annual_return_percent: annualReturn,
         inflation_percent: 0,
-    }).then((res) => {
+    }).then((res: LumpsumProjectionResponse) => {
         setResult({
             invested: res.principal,
             maturity: res.maturity_value,
