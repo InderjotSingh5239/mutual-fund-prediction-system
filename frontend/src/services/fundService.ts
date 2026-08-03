@@ -1,4 +1,4 @@
-import { MUTUAL_FUNDS, getFundById } from '@/data/mutualFunds'
+import { MUTUAL_FUNDS } from '@/data/mockFunds'
 import type { MutualFund, FundCategory, AMC, RiskLevel } from '@/types/fund'
 import type { ApiMutualFundDetail, ApiMutualFundListResponse } from '@/types/api'
 import { apiClient, isBackendConfigured } from '@/api/client'
