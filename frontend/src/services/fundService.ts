@@ -107,8 +107,8 @@ export async function fetchFunds(
 ): Promise<PaginatedFunds> {
 
   if (!isBackendConfigured) {
-    return fetchFundsFromMock(filters)
-  }
+    throw new Error("Backend URL is not configured.");
+}
 
   try {
     return await fetchFundsFromApi(filters)
@@ -124,9 +124,8 @@ export async function fetchFundById(
 ): Promise<MutualFund | undefined> {
 
   if (!isBackendConfigured) {
-    return delay(getFundById(id))
-  }
-
+    throw new Error("Backend URL is not configured.");
+}
   try {
     const { data } = await apiClient.get<ApiMutualFundDetail>(`/funds/${id}`)
     return adaptApiFundDetail(data)
@@ -168,7 +167,11 @@ export async function fetchTopLosers(limit = 5): Promise<MutualFund[]> {
  */
 export async function fetchTrendingFunds(limit = 6): Promise<MutualFund[]> {
   if (isBackendConfigured) {
-    return fetchTopGainers(limit)
+   const { data } = await apiClient.get("/funds/trending", {
+    params: { limit }
+})
+
+return data.items.map(adaptApiFund)
   }
   const sorted = [...MUTUAL_FUNDS].sort((a, b) => (b.cagr3y ?? 0) - (a.cagr3y ?? 0))
   return delay(sorted.slice(0, limit))
