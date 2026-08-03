@@ -25,7 +25,11 @@ class PredictionRead(BaseModel):
     explanation: str | None = None
     created_at: datetime
 
+class HistoricalNAV(BaseModel):
+    date: date
+    nav: float
 
 class PredictionListResponse(BaseModel):
     fund_id: uuid.UUID
+    historical_nav: list[HistoricalNAV]
     predictions: list[PredictionRead]
