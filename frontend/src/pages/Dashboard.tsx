@@ -23,7 +23,7 @@ export default function Dashboard() {
   const { data: gainers, isLoading: loadingGainers } = useTopGainers(4)
   const { data: losers, isLoading: loadingLosers } = useTopLosers(4)
   const { data: trending, isLoading: loadingTrending } = useTrendingFunds(3)
-  const { data: AI_PICKS = [], isLoading: loadingAIPicks } = useTrendingFunds(6)
+ const { data: AI_PICKS = [] } = useTrendingFunds(6)
 
   const benchmarkFund = trending?.[0]
 
@@ -70,7 +70,7 @@ export default function Dashboard() {
               <Badge variant="emerald">{formatPercent(benchmarkFund?.navChangePercent ?? 0)}</Badge>
             </CardHeader>
             <CardContent>
-              <NavHistoryChart data={benchmarkFund?.navHistory} showMovingAverages />
+              <NavHistoryChart data={benchmarkFund?.navHistory ?? []} showMovingAverages />
             </CardContent>
           </Card>
 
