@@ -34,6 +34,7 @@ useEffect(() => {
             })),
         })
     })
+  .catch(console.error)
 }, [principal, years, annualReturn])
   if (!result) {
     return <div>Loading...</div>
