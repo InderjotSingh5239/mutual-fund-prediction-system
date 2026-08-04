@@ -59,8 +59,7 @@ def _with_nav_change(fund, nav_map: dict[uuid.UUID, tuple[float, float | None]])
 @router.post(
     "/sync/amfi",
     response_model=MutualFundSyncResponse,
-    tags=["Funds", "Admin"],
-    dependencies=[Depends(require_admin)],
+    tags=["Funds"],
 )
 def trigger_amfi_sync(db: Session = Depends(get_db)) -> MutualFundSyncResponse:
     """Manually trigger the AMFI NAV ETL pipeline (admin only)."""
