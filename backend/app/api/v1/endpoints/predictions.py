@@ -25,7 +25,6 @@ router = APIRouter()
     "/{fund_id}/generate",
     response_model=PredictionListResponse,
     tags=["Predictions"],
-    dependencies=[Depends(require_admin)],
 )
 def generate_predictions(fund_id: uuid.UUID, db: Session = Depends(get_db)) -> PredictionListResponse:
     fund = FundRepository(db).get_by_id(fund_id)
