@@ -8,7 +8,7 @@ export async function calculateSip(data: {
   inflation_percent?: number
 }) {
   const res = await apiClient.post('/calculators/sip', data)
-  return res.data
+ return res.data as SIPProjectionResponse
 }
 
 export async function calculateLumpsum(data: {
@@ -18,5 +18,5 @@ export async function calculateLumpsum(data: {
   inflation_percent?: number
 }) {
   const res = await apiClient.post('/calculators/lumpsum', data)
-  return res.data
+  return res.data as LUMPSUMProjectionResponse
 }
