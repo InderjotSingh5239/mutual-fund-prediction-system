@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import type { LumpsumProjectionResponse } from '@/types/api'
+  import { useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -15,27 +16,19 @@ export default function LumpsumCalculator() {
   const [years, setYears] = useState(10)
   const [annualReturn, setAnnualReturn] = useState(12)
 
-  const [result, setResult] = useState<any>(null)
+ const [result, setResult] = useState<LumpsumProjectionResponse | null>(null)
 
 useEffect(() => {
-    calculateLumpsum({
-        principal,
-        duration_years: years,
-        expected_annual_return_percent: annualReturn,
-        inflation_percent: 0,
-    }).then((res: LumpsumProjectionResponse) => {
-        setResult({
-            invested: res.principal,
-            maturity: res.maturity_value,
-            returns: res.estimated_returns,
-            series: res.yearly_breakdown.map((item: any) => ({
-                year: item.year,
-                value: item.value,
-            })),
-        })
-    })
-  .catch(console.error)
+  calculateLumpsum({
+    principal,
+    duration_years: years,
+    expected_annual_return_percent: annualReturn,
+    inflation_percent: 0,
+  })
+    .then(setResult)
+    .catch(console.error)
 }, [principal, years, annualReturn])
+  
   if (!result) {
     return <div>Loading...</div>
 }
@@ -70,19 +63,19 @@ useEffect(() => {
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Invested Amount</p>
-                <p className="text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">{formatCurrency(result.invested, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">{formatCurrency(result.principal, true)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Estimated Returns</p>
-                <p className="text-2xl font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(result.returns, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(result.estimated_returns, true)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Total Value</p>
-                <p className="text-2xl font-mono-data font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(result.maturity, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(result.maturity_value, true)}</p>
               </CardContent>
             </Card>
           </div>
@@ -94,7 +87,7 @@ useEffect(() => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={result.series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <AreaChart data={result.yearly_breakdown} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="lumpValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#0fae72" stopOpacity={0.3} />
@@ -118,8 +111,8 @@ useEffect(() => {
             <CardContent>
               <AllocationDonut
                 data={[
-                  { name: 'Invested', value: result.invested },
-                  { name: 'Returns', value: result.returns },
+                  { name: 'Invested', value: result.principal},
+                  { name: 'Returns', value: result.estimated_returns },
                 ]}
                 height={200}
               />
