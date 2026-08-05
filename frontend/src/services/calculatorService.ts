@@ -1,4 +1,7 @@
-import { apiClient } from '@/api/client'
+import type {
+  ApiSipResponse,
+  ApiLumpsumResponse,
+} from '@/types/api'
 
 export async function calculateSip(data: {
   monthly_investment: number
@@ -8,7 +11,7 @@ export async function calculateSip(data: {
   inflation_percent?: number
 }) {
   const res = await apiClient.post('/calculators/sip', data)
- return res.data as SIPProjectionResponse
+return res.data as ApiSipResponse
 }
 
 export async function calculateLumpsum(data: {
@@ -18,5 +21,5 @@ export async function calculateLumpsum(data: {
   inflation_percent?: number
 }) {
   const res = await apiClient.post('/calculators/lumpsum', data)
-  return res.data as LUMPSUMProjectionResponse
+  return res.data as ApiLumpsumResponse
 }
