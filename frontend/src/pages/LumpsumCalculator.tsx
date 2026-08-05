@@ -1,5 +1,5 @@
 import type { LumpsumProjectionResponse } from '@/types/api'
-  import { useState } from 'react'
+import { useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -8,8 +8,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
 import { useEffect } from 'react'
 import { calculateLumpsum } from '@/services/calculatorService'
-
-
 
 export default function LumpsumCalculator() {
   const [principal, setPrincipal] = useState(100000)
@@ -87,7 +85,9 @@ useEffect(() => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={result.yearly_breakdown} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <AreaChart data={result.yearly_breakdown.map((item: any) => ({ year: item.year, value: item.value,
+                        }))}
+                > margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="lumpValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#0fae72" stopOpacity={0.3} />
@@ -148,7 +148,7 @@ function SliderInput({
         <span className="text-sm font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{format(value)}</span>
       </div>
       <input
-        type="range"
+        type="number"
         min={min}
         max={max}
         step={step}
