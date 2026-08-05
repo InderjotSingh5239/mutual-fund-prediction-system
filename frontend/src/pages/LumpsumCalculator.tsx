@@ -1,4 +1,4 @@
-import type { LumpsumProjectionResponse } from '@/types/api'
+import type { ApiLumpsumResponse } from '@/types/api'
 import { useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -14,7 +14,7 @@ export default function LumpsumCalculator() {
   const [years, setYears] = useState(10)
   const [annualReturn, setAnnualReturn] = useState(12)
 
- const [result, setResult] = useState<LumpsumProjectionResponse | null>(null)
+ const [result, setResult] = useState<ApiLumpsumResponse | null>(null)
 
 useEffect(() => {
   calculateLumpsum({
