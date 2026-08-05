@@ -69,6 +69,8 @@ class CalculatorService:
     @staticmethod
     def project_lumpsum(request: LumpsumProjectionRequest) -> LumpsumProjectionResponse:
         annual_rate = request.expected_annual_return_percent / 100.0
+        monthly_rate = annual_rate / 12
+        months = int(request.duration_years * 12)
         yearly_breakdown = []
         value = request.principal
 
@@ -79,13 +81,22 @@ class CalculatorService:
                                     })
 
         remainder = request.duration_years - full_years
+
         if remainder > 0:
-            value = value * (1 + annual_rate) ** remainder
-            yearly_breakdown.append({"year": round(full_years + remainder, 2), "value": round(value, 2)})
+            total_months = request.duration_years * 12
+            value = request.principal * ((1 + monthly_rate) ** total_months)
 
-        estimated_returns = value - request.principal
+        yearly_breakdown.append(
+            {
+            "year": round(request.duration_years, 2),
+            "invested": request.principal,
+            "returns": round(value - request.principal, 2),
+            "value": round(value, 2),
+            }
+        )
+            estimated_returns = value - request.principal
 
-        inflation_adjusted_value = None
+            inflation_adjusted_value = None
         if request.inflation_percent > 0:
             inflation_adjusted_value = value / (
                 (1 + request.inflation_percent / 100.0) ** request.duration_years
