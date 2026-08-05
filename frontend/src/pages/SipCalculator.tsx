@@ -7,14 +7,14 @@ import { AllocationDonut } from '@/components/charts/AllocationDonut'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
 import { Link } from 'react-router-dom'
-import type { SIPProjectionResponse } from "@/types/calculator" 
+import type { ApiSipResponse } from "@/types/api"
 
 
 export default function SipCalculator() {
   const [monthly, setMonthly] = useState(10000)
   const [years, setYears] = useState(15)
   const [annualReturn, setAnnualReturn] = useState(12) 
-  const [result, setResult] = useState<SIPProjectionResponse | null>(null)
+  const [result, setResult] = useState<ApiSipResponse | null>(null)
 
 useEffect(() => {
   const timer = setTimeout(async () => {
