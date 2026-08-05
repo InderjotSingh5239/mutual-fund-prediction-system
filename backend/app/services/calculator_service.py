@@ -43,12 +43,8 @@ class CalculatorService:
                 month_counter += 1
 
             yearly_breakdown.append(
-                {
-                    "year": year,
-                    "monthly_investment": round(current_monthly_investment, 2),
-                    "total_invested_so_far": round(total_invested, 2),
-                    "corpus_value": round(corpus, 2),
-                }
+                { "year": year, "monthly_investment": round(current_monthly_investment,2), "total_invested_so_far": round(total_invested,2), "estimated_returns": round(corpus-total_invested,2), "corpus_value": round(corpus,2)
+}
             )
             # Apply step-up for next year
             current_monthly_investment *= 1 + (request.step_up_percent / 100.0)
@@ -78,8 +74,9 @@ class CalculatorService:
 
         full_years = math.floor(request.duration_years)
         for year in range(1, full_years + 1):
-            value = value * (1 + annual_rate)
-            yearly_breakdown.append({"year": year, "value": round(value, 2)})
+            value = request.principal * ((1 + monthly_rate) ** (year * 12))
+            yearly_breakdown.append({"year": year, "invested": request.principal, "returns": round(value - request.principal, 2), "value": round(value,2)
+                                    })
 
         remainder = request.duration_years - full_years
         if remainder > 0:
