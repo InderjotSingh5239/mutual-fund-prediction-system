@@ -7,25 +7,36 @@ import { AllocationDonut } from '@/components/charts/AllocationDonut'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
 import { Link } from 'react-router-dom'
+import type { SIPProjectionResponse } from "@/types/calculator" 
 
 
 export default function SipCalculator() {
   const [monthly, setMonthly] = useState(10000)
   const [years, setYears] = useState(15)
-  const [annualReturn, setAnnualReturn] = useState(12)
-  const [result, setResult] = useState<any>(null)
+  const [annualReturn, setAnnualReturn] = useState(12) 
+  const [result, setResult] = useState<SIPProjectionResponse | null>(null)
 
 useEffect(() => {
-  calculateSip({
-    monthly_investment: monthly,
-    duration_years: years,
-    expected_annual_return_percent: annualReturn,
-    step_up_percent: 0,
-    inflation_percent: 0,
-  })
-    .then(setResult)
-    .catch(console.error)
-}, [monthly, years, annualReturn])
+  const timer = setTimeout(async () => {
+    try {
+      const response = await calculateSip({
+        monthly_investment: monthly,
+        duration_years: years,
+        expected_annual_return_percent: annualReturn,
+        step_up_percent: 0,
+        inflation_percent: 0,
+      })
+
+      setResult(response)
+
+    } catch (err) {
+      console.error(err)
+    }
+  },300)
+
+  return ()=>clearTimeout(timer)
+
+},[monthly,years,annualReturn])
 
   return (
     <div className="space-y-6">
@@ -125,6 +136,7 @@ useEffect(() => {
 }
 
 function SliderInput({
+
   label,
   value,
   min,
@@ -133,6 +145,7 @@ function SliderInput({
   onChange,
   format,
 }: {
+
   label: string
   value: number
   min: number
@@ -148,7 +161,7 @@ function SliderInput({
         <span className="text-sm font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{format(value)}</span>
       </div>
       <input
-        type="range"
+        type="number"
         min={min}
         max={max}
         step={step}
