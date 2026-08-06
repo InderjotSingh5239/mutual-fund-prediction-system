@@ -161,21 +161,13 @@ function SliderInput({
         <span className="text-sm font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{format(value)}</span>
       </div>
       <input
-        type="number"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e)=>{
-
-const value=Number(e.target.value)
-
-if(isNaN(value)) return
-
-onChange(value)
-
-}}
-        className="w-full accent-emerald-500"
+          type="number"
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          onChange={(e)=>onChange(Number(e.target.value))}
+          className="w-full rounded-md border p-2"
       />
     </div>
   )
