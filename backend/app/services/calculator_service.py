@@ -93,11 +93,11 @@ class CalculatorService:
             total_months = int(round(request.duration_years * 12))
             value = request.principal * ((1 + monthly_rate) ** total_months)
            
-        yearly_breakdown.append({
-            "year": round(request.duration_years, 2),
-            "invested": request.principal,
-            "returns": round(value - request.principal, 2),
-            "value": round(value, 2),
+            yearly_breakdown.append({
+                "year": round(request.duration_years, 2),
+                "invested": request.principal,
+                "returns": round(value - request.principal, 2),
+                "value": round(value, 2),
             })
         estimated_returns = value - request.principal
 
