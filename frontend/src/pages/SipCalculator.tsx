@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
 import { calculateSip } from '@/services/calculatorService'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { AllocationDonut } from '@/components/charts/AllocationDonut'
@@ -37,6 +36,14 @@ useEffect(() => {
   return ()=>clearTimeout(timer)
 
 },[monthly,years,annualReturn])
+
+if (!result) {
+  return (
+    <div className="flex justify-center items-center h-96">
+      Loading...
+    </div>
+  )
+}
 
   return (
     <div className="space-y-6">
@@ -166,7 +173,11 @@ function SliderInput({
           min={min}
           max={max}
           step={step}
-          onChange={(e)=>onChange(Number(e.target.value))}
+          onChange={(e)=>{ const val = Number(e.target.value)
+
+           if(isNaN(val)) return
+                onChange(val)
+}}
           className="w-full rounded-md border p-2"
       />
     </div>
