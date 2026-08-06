@@ -42,7 +42,7 @@ export interface ApiMutualFundListResponse {
 }
 
 // =====================================================
-// Risk
+// Risk Profile
 // =====================================================
 
 export interface ApiFundRiskProfile {
@@ -58,7 +58,7 @@ export interface ApiFundRiskProfile {
 }
 
 // =====================================================
-// Predictions
+// Prediction
 // =====================================================
 
 export interface ApiPrediction {
@@ -72,7 +72,7 @@ export interface ApiPrediction {
   risk_score: number
   lower_bound: number | null
   upper_bound: number | null
-  recommendation: 'BUY' | 'HOLD' | 'SELL'
+  recommendation: string
   explanation: string | null
   created_at: string
 }
@@ -135,11 +135,10 @@ export interface ApiNews {
   published_at: string
   summary: string | null
   category: string | null
-  sentiment_label: 'positive' | 'negative' | 'neutral' | null
+  sentiment_label: string | null
   sentiment_score: number | null
   impact_score: number | null
 }
-
 // =====================================================
 // Portfolio
 // =====================================================
@@ -172,7 +171,13 @@ export interface ApiTransaction {
   portfolio_id: string
   fund_id: string
   fund_name: string
-  transaction_type: 'BUY' | 'SELL' | 'SIP' | 'DIVIDEND_REINVEST' | 'SWITCH_IN' | 'SWITCH_OUT'
+  transaction_type:
+    | 'BUY'
+    | 'SELL'
+    | 'SIP'
+    | 'DIVIDEND_REINVEST'
+    | 'SWITCH_IN'
+    | 'SWITCH_OUT'
   units: number
   nav: number
   amount: number
@@ -231,20 +236,19 @@ export interface ApiAlert {
   created_at: string
   triggered_at: string | null
 }
-
 // =====================================================
 // Calculators - Shared
 // =====================================================
 
 export interface ApiYearlyBreakdown {
   year: number
-  monthly_investment?: number
-  total_invested_so_far?: number
-  corpus_value: number
+  invested: number
+  returns: number
+  value: number
 }
 
 // =====================================================
-// Calculators - SIP
+// SIP Calculator
 // =====================================================
 
 export interface ApiSipRequest {
@@ -264,7 +268,7 @@ export interface ApiSipResponse {
 }
 
 // =====================================================
-// Calculators - Lumpsum
+// Lumpsum Calculator
 // =====================================================
 
 export interface ApiLumpsumRequest {
@@ -283,7 +287,7 @@ export interface ApiLumpsumResponse {
 }
 
 // =====================================================
-// Calculators - Retirement
+// Retirement Calculator
 // =====================================================
 
 export interface ApiRetirementRequest {
@@ -308,7 +312,7 @@ export interface ApiRetirementResponse {
 }
 
 // =====================================================
-// Calculators - Monte Carlo
+// Monte Carlo Calculator
 // =====================================================
 
 export interface ApiMonteCarloRequest {
