@@ -12,12 +12,12 @@ import { NavHistoryChart } from '@/components/charts/NavHistoryChart'
 import { useTopGainers, useTopLosers, useTrendingFunds } from '@/hooks/useFunds'
 import { formatPercent } from '@/lib/utils'
 
-const RECENT_ACTIVITY = [
+/*const RECENT_ACTIVITY = [
   { id: 1, action: 'SIP executed', fund: 'Parag Parikh Flexi Cap Fund', amount: '₹5,000', time: '2h ago' },
   { id: 2, action: 'Added to watchlist', fund: 'Mirae Asset Tax Saver Fund', amount: null, time: '5h ago' },
   { id: 3, action: 'AI prediction generated', fund: 'SBI Small Cap Fund', amount: null, time: '1d ago' },
   { id: 4, action: 'Lumpsum invested', fund: 'HDFC Top 100 Fund', amount: '₹25,000', time: '2d ago' },
-]
+]*/
 
 export default function Dashboard() {
   const { data: gainers, isLoading: loadingGainers } = useTopGainers(4)
@@ -43,7 +43,14 @@ export default function Dashboard() {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Wallet} label="Portfolio Value" value="₹4,82,650" delta="+3.2%" positive accent="emerald" />
+        <StatCard
+  icon={Wallet}
+  label="Portfolio Value"
+  value="--"
+  delta="Connect Portfolio"
+  positive={false}
+  accent="emerald"
+        />
         <StatCard
   icon={Activity}
   label="Total Funds Tracked"
@@ -51,9 +58,23 @@ export default function Dashboard() {
   delta="+2 this month"
   positive
   accent="blue"
-/>
-        <StatCard icon={TrendingUp} label="Top Category CAGR" value="26.7%" delta="Small Cap" positive accent="emerald" />
-        <StatCard icon={TrendingDown} label="Avg. Expense Ratio" value="0.58%" delta="-0.03%" positive accent="amber" />
+        />
+        <StatCard
+  icon={TrendingUp}
+  label="Top Category CAGR"
+  value="--"
+  delta="Real data pending"
+  positive={false}
+  accent="emerald"
+        />
+        <StatCard
+  icon={TrendingDown}
+  label="Avg. Expense Ratio"
+  value="--"
+  delta="Real data pending"
+  positive={false}
+  accent="amber"
+        />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
