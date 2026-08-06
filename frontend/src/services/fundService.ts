@@ -107,9 +107,8 @@ export async function fetchFunds(
 ): Promise<PaginatedFunds> {
 
   if (!isBackendConfigured) {
-    throw new Error("Backend URL is not configured.");
+    return fetchFundsFromMock(filters)
 }
-
   try {
     return await fetchFundsFromApi(filters)
   } catch (error) {
@@ -124,7 +123,7 @@ export async function fetchFundById(
 ): Promise<MutualFund | undefined> {
 
   if (!isBackendConfigured) {
-    throw new Error("Backend URL is not configured.");
+    return MUTUAL_FUNDS.find(f => f.id === id)
 }
   try {
     const { data } = await apiClient.get<ApiMutualFundDetail>(`/funds/${id}`)
