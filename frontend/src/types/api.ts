@@ -197,6 +197,12 @@ export interface ApiAlert {
 }
 
 // --- Calculators ---------------------------------------------------------
+export interface ApiYearlyBreakdown {
+  year: number
+  invested: number
+  returns: number
+  value: number
+}
 
 export interface ApiSipRequest {
   monthly_investment: number
@@ -211,7 +217,7 @@ export interface ApiSipResponse {
   maturity_value: number
   estimated_returns: number
   inflation_adjusted_value: number | null
-  yearly_breakdown: Record<string, number>[]
+  yearly_breakdown: ApiYearlyBreakdown[]
 }
 
 export interface ApiLumpsumRequest {
@@ -226,7 +232,7 @@ export interface ApiLumpsumResponse {
   maturity_value: number
   estimated_returns: number
   inflation_adjusted_value: number | null
-  yearly_breakdown: Record<string, number>[]
+ yearly_breakdown: ApiYearlyBreakdown[]
 }
 
 export interface ApiRetirementRequest {
