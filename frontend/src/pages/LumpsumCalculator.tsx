@@ -66,19 +66,19 @@ useEffect(() => {
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Invested Amount</p>
-                <p className="text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">{formatCurrency(result.principal, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">{formatCurrency(result?.principal ?? 0, true)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Estimated Returns</p>
-                <p className="text-2xl font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(result.estimated_returns, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-emerald-600 dark:text-emerald-400">{formatCurrency(result?.estimated_returns ?? 0, true)}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5">
                 <p className="text-xs text-ink-500 dark:text-paper-200/50 uppercase mb-1">Total Value</p>
-                <p className="text-2xl font-mono-data font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(result.maturity_value, true)}</p>
+                <p className="text-2xl font-mono-data font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(result?.maturity_value ?? 0, true)}</p>
               </CardContent>
             </Card>
           </div>
@@ -91,9 +91,10 @@ useEffect(() => {
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
                <AreaChart 
-                 data={(result.yearly_breakdown ?? []).map((item) => ({ 
+                 data={(result?.yearly_breakdown ?? []).map((item) => ({ 
                     year: item.year, 
                     value: item.value,
+                    invested: inversted.value,
                 }))}
                 margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
               >
@@ -102,12 +103,17 @@ useEffect(() => {
                       <stop offset="0%" stopColor="#0fae72" stopOpacity={0.3} />
                       <stop offset="100%" stopColor="#0fae72" stopOpacity={0} />
                     </linearGradient>
+                    <linearGradient id="lumpPrincipal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#64748b" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="#64748b" stopOpacity={0} />
+                    </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.15)" vertical={false} />
                   <XAxis dataKey="year" tickFormatter={(v) => `Y${v}`} tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} tickFormatter={(v) => formatCurrency(v, true)} axisLine={false} tickLine={false} width={64} />
                   <Tooltip formatter={(v) => formatCurrency(chartValueToNumber(v))} labelFormatter={(v) => `Year ${v}`} />
                   <Area type="monotone" dataKey="value" name="Value" stroke="#0fae72" fill="url(#lumpValue)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="invested" name="Principal" stroke="#64748b" fill="url(#lumpPrincipal)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -119,10 +125,8 @@ useEffect(() => {
             </CardHeader>
             <CardContent>
               <AllocationDonut
-                data={[
-                  { name: 'Invested', value: result.principal},
-                  { name: 'Returns', value: result.estimated_returns },
-                ]}
+                  data={[{ name: 'Principal', value: result.principal ?? 0 }, { name: 'Returns', value: result.estimated_returns ?? 0 }, 
+                        ]}
                 height={200}
               />
             </CardContent>
