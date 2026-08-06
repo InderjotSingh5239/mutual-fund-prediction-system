@@ -114,9 +114,29 @@ if (!result) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,116,139,0.15)" vertical={false} />
                   <XAxis dataKey="year" tickFormatter={(v) => `Y${v}`} tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} tickFormatter={(v) => formatCurrency(v, true)} axisLine={false} tickLine={false} width={64} />
-                  <Tooltip formatter={(v) => formatCurrency(chartValueToNumber(v))} labelFormatter={(v) => `Year ${v}`} separator=" : " cursor={{stroke:"#10b981"}} />
-                  <Area type="monotone" dataKey="value" name="Projected Value" stroke="#2f6fed" fill="url(#sipValue)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="invested" name="Invested" stroke="#64748b" fill="url(#sipInvested)" strokeWidth={2} />
+                  <Tooltip
+                     formatter={(value: any) => formatCurrency(chartValueToNumber(value))}
+                     labelFormatter={(label: any) => `Year ${label}`}
+                     separator=" : "
+                     cursor={{ stroke: "#10b981" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    name="Projected Value"
+                    stroke="#2f6fed"
+                    fill="url(#sipValue)"
+                    strokeWidth={2}
+                  />
+
+                  <Area
+                    type="monotone"
+                    dataKey="invested"
+                    name="Invested"
+                    stroke="#64748b"
+                    fill="url(#sipInvested)"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
