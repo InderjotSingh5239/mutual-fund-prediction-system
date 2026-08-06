@@ -42,17 +42,16 @@ class CalculatorService:
                 total_invested += current_monthly_investment
                 month_counter += 1
 
-                yearly_breakdown.append({
-    "year": year,
-    "monthly_sip": round(current_monthly_investment, 2),
-    "invested": round(total_invested, 2),
-    "returns": round(corpus - total_invested, 2),
-    "value": round(corpus, 2),
-})
+            yearly_breakdown.append({
+                "year": year,
+                "monthly_sip": round(current_monthly_investment, 2),
+                "invested": round(total_invested, 2),
+                "returns": round(corpus - total_invested, 2),
+                "value": round(corpus, 2),
+                    })
             # Apply step-up for next year
             current_monthly_investment *= 1 + (request.step_up_percent / 100.0)
 
-        estimated_returns = corpus - total_invested
         total_invested = round(total_invested,2)
         corpus = round(corpus,2)
         estimated_returns = round(corpus-total_invested,2)
@@ -77,8 +76,8 @@ class CalculatorService:
     @staticmethod
     def project_lumpsum(request: LumpsumProjectionRequest) -> LumpsumProjectionResponse:
         annual_rate = request.expected_annual_return_percent / 100.0
-        monthly_rate = annual_rate / 12
-        months = int(request.duration_years * 12)
+        monthly_rate = (1 + annual_rate) ** (1 / 12) - 1
+        
         yearly_breakdown = []
         value = request.principal
 
@@ -91,29 +90,27 @@ class CalculatorService:
         remainder = request.duration_years - full_years
 
         if remainder > 0:
-            total_months = request.duration_years * 12
+            total_months = int(round(request.duration_years * 12))
             value = request.principal * ((1 + monthly_rate) ** total_months)
-
-        yearly_breakdown.append(
-            {
+           
+        yearly_breakdown.append({
             "year": round(request.duration_years, 2),
             "invested": request.principal,
             "returns": round(value - request.principal, 2),
             "value": round(value, 2),
-            }
-        )
-            estimated_returns = value - request.principal
+            })
+        estimated_returns = value - request.principal
 
-            inflation_adjusted_value = None
+        inflation_adjusted_value = None
         if request.inflation_percent > 0:
-           inflation_adjusted_value = round(corpus /
-            ((1 + request.inflation_percent/100) ** request.duration_years), 2)
+            inflation_adjusted_value = round(value /((1 + request.inflation_percent / 100) ** request.duration_years), 2,
+            )
 
         return LumpsumProjectionResponse(
             principal=request.principal,
             maturity_value=round(value, 2),
             estimated_returns=round(estimated_returns, 2),
-           inflation_adjusted_value=inflation_adjusted_value if inflation_adjusted_value else None,
+            inflation_adjusted_value=inflation_adjusted_value if inflation_adjusted_value else None,
             yearly_breakdown=yearly_breakdown,
         )
 
