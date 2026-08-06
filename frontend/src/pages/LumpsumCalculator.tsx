@@ -1,12 +1,11 @@
 import type { ApiLumpsumResponse } from '@/types/api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Calculator } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { AllocationDonut } from '@/components/charts/AllocationDonut'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { chartValueToNumber, formatCurrency } from '@/lib/utils'
-import { useEffect } from 'react'
 import { calculateLumpsum } from '@/services/calculatorService'
 
 export default function LumpsumCalculator() {
@@ -28,7 +27,11 @@ useEffect(() => {
 }, [principal, years, annualReturn])
   
   if (!result) {
-    return <div>Loading...</div>
+  return (
+    <div className="flex items-center justify-center h-96">
+      Loading calculator...
+    </div>
+  )
 }
   return (
     <div className="space-y-6">
@@ -85,7 +88,7 @@ useEffect(() => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={result.yearly_breakdown.map((item: any) => ({ 
+                <AreaChart data={result.yearly_breakdown.map((item: {year:number,value:number}) => ({ 
                               year: item.year, 
                               value: item.value,
                           }))}
