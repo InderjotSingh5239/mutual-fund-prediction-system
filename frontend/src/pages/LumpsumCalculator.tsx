@@ -22,9 +22,11 @@ useEffect(() => {
     expected_annual_return_percent: annualReturn,
     inflation_percent: 0,
   })
-    .then(setResult)
-    .catch(console.error)
-}, [principal, years, annualReturn])
+    .then((response) => setResult(response))
+    .catch((error) => {
+      console.error(error)
+  })
+  }, [principal, years, annualReturn])
   
   if (!result) {
   return (
@@ -89,7 +91,7 @@ useEffect(() => {
             <CardContent>
               <ResponsiveContainer width="100%" height={280}>
                <AreaChart 
-                 data={(result.yearly_breakdown as any[]).map((item) => ({ 
+                 data={(result.yearly_breakdown ?? []).map((item) => ({ 
                     year: item.year, 
                     value: item.value,
                 }))}
