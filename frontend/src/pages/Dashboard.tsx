@@ -173,7 +173,6 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Recent Activity
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
