@@ -178,16 +178,15 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-1">
             {RECENT_ACTIVITY.map((a) => (
-              <div key={a.id} className="flex items-start justify-between gap-2 py-2.5 border-b border-ink-950/5 dark:border-white/5 last:border-0">
-                <div>
-                  <p className="text-sm text-ink-950 dark:text-paper-100">{a.action}</p>
-                  <p className="text-xs text-ink-500 dark:text-paper-200/50">{a.fund}</p>
-                </div>
-                <div className="text-right shrink-0">
-                  {a.amount && <p className="text-sm font-mono-data font-medium text-ink-950 dark:text-white">{a.amount}</p>}
-                  <p className="text-xs text-ink-500 dark:text-paper-200/40">{a.time}</p>
-                </div>
-              </div>
+              <div className="py-6 text-center">
+              <p className="text-sm text-ink-500 dark:text-paper-200/50">
+                      No recent activity available.
+                  </p>
+              <p className="text-xs text-ink-500/70 dark:text-paper-200/40 mt-1">
+              Activity will appear here when portfolio transactions, SIPs,
+              watchlist actions, or predictions are available from the API.
+              </p>
+</div>
             ))}
           </CardContent>
         </Card>
