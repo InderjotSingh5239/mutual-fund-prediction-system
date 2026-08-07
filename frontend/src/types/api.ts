@@ -1,5 +1,10 @@
 // =====================================================
-// Navigation
+// API Wire-Format Types
+// Matches the FastAPI backend JSON/Pydantic schemas.
+// =====================================================
+
+// =====================================================
+// Navigation / NAV History
 // =====================================================
 
 export interface ApiNavHistoryPoint {
@@ -42,7 +47,7 @@ export interface ApiMutualFundListResponse {
 }
 
 // =====================================================
-// Risk Profile
+// Fund Risk Profile
 // =====================================================
 
 export interface ApiFundRiskProfile {
@@ -58,7 +63,7 @@ export interface ApiFundRiskProfile {
 }
 
 // =====================================================
-// Prediction
+// Predictions
 // =====================================================
 
 export interface ApiPrediction {
@@ -72,7 +77,7 @@ export interface ApiPrediction {
   risk_score: number
   lower_bound: number | null
   upper_bound: number | null
-  recommendation: string
+  recommendation: 'BUY' | 'HOLD' | 'SELL'
   explanation: string | null
   created_at: string
 }
@@ -139,6 +144,7 @@ export interface ApiNews {
   sentiment_score: number | null
   impact_score: number | null
 }
+
 // =====================================================
 // Portfolio
 // =====================================================
@@ -236,8 +242,9 @@ export interface ApiAlert {
   created_at: string
   triggered_at: string | null
 }
+
 // =====================================================
-// Calculators - Shared
+// Calculator - Shared
 // =====================================================
 
 export interface ApiYearlyBreakdown {
