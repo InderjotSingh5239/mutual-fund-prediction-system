@@ -115,8 +115,8 @@ if (!result) {
                   <XAxis dataKey="year" tickFormatter={(v) => `Y${v}`} tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fontFamily: 'IBM Plex Mono' }} tickFormatter={(v) => formatCurrency(v, true)} axisLine={false} tickLine={false} width={64} />
                   <Tooltip
-                     formatter={(value: any) => formatCurrency(chartValueToNumber(value))}
-                     labelFormatter={(label: any) => `Year ${label}`}
+                     formatter={(value) => formatCurrency(chartValueToNumber(value))}
+                     labelFormatter={(label) => `Year ${label}`}
                      separator=" : "
                      cursor={{ stroke: "#10b981" }}
                   />
