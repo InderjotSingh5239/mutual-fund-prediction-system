@@ -1,16 +1,17 @@
-import axios from "axios";
+import axios from 'axios'
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "https://mutual-fund-prediction-system.onrender.com";
+  'https://mutual-fund-prediction-system.onrender.com'
 
 export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
-});
+  timeout: 30000,
+})
 
-export const isBackendConfigured = Boolean(API_URL);
+export const isBackendConfigured = Boolean(API_URL)
 
-export default apiClient;
+export default apiClient
