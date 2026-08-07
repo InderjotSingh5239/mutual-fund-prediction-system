@@ -1,4 +1,4 @@
-import { Wallet, TrendingUp, TrendingDown, Sparkles, Activity, Clock, ArrowRight } from 'lucide-react'
+import { Wallet, TrendingUp, TrendingDown, Sparkles, Activity, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -18,13 +18,6 @@ import { formatPercent } from '@/lib/utils'
   { id: 3, action: 'AI prediction generated', fund: 'SBI Small Cap Fund', amount: null, time: '1d ago' },
   { id: 4, action: 'Lumpsum invested', fund: 'HDFC Top 100 Fund', amount: '₹25,000', time: '2d ago' },
 ]*/
-const RECENT_ACTIVITY: Array<{
-  id: number
-  action: string
-  fund: string
-  amount: string | null
-  time: string
-}> = []
 
 export default function Dashboard() {
   const { data: gainers, isLoading: loadingGainers } = useTopGainers(4)
