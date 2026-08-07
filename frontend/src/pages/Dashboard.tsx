@@ -18,6 +18,13 @@ import { formatPercent } from '@/lib/utils'
   { id: 3, action: 'AI prediction generated', fund: 'SBI Small Cap Fund', amount: null, time: '1d ago' },
   { id: 4, action: 'Lumpsum invested', fund: 'HDFC Top 100 Fund', amount: '₹25,000', time: '2d ago' },
 ]*/
+const RECENT_ACTIVITY: Array<{
+  id: number
+  action: string
+  fund: string
+  amount: string | null
+  time: string
+}> = []
 
 export default function Dashboard() {
   const { data: gainers, isLoading: loadingGainers } = useTopGainers(4)
