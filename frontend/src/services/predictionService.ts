@@ -5,10 +5,6 @@ import { apiClient } from '@/api/client'
 import { adaptApiPrediction } from '@/services/predictionAdapter'
 import { fetchFundById } from '@/services/fundService'
 
-function delay<T>(value: T, ms = 1400): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms))
-}
-
 export class PredictionNotAvailableError extends Error {}
 
 async function requestPredictionFromApi(
