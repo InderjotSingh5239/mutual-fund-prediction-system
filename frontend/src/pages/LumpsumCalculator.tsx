@@ -94,7 +94,7 @@ useEffect(() => {
                  data={(result?.yearly_breakdown ?? []).map((item) => ({ 
                     year: item.year, 
                     value: item.value,
-                    invested: invested.value,
+                    invested: item.invested,
                 }))}
                 margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
               >
