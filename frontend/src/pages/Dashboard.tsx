@@ -184,7 +184,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-1">
-            {RECENT_ACTIVITY.map((a) => (
+            
               <div className="py-6 text-center">
               <p className="text-sm text-ink-500 dark:text-paper-200/50">
                       No recent activity available.
@@ -194,7 +194,7 @@ export default function Dashboard() {
               watchlist actions, or predictions are available from the API.
               </p>
 </div>
-            ))}
+            
           </CardContent>
         </Card>
       </div>
