@@ -1,7 +1,7 @@
 
 import type { PredictionHorizon, PredictionResult } from '@/types/fund'
 import type { ApiPredictionListResponse } from '@/types/api'
-import { apiClient, isBackendConfigured } from '@/api/client'
+import { apiClient } from '@/api/client'
 import { adaptApiPrediction } from '@/services/predictionAdapter'
 import { fetchFundById } from '@/services/fundService'
 
