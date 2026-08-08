@@ -1,20 +1,74 @@
-import { MOCK_NEWS, type NewsItem } from '@/data/mockNews'
 import type { ApiNews } from '@/types/api'
-import { apiClient, isBackendConfigured } from '@/api/client'
-import { adaptApiNews } from '@/services/newsAdapter'
+import { apiClient } from '@/api/client'
 
-function delay<T>(value: T, ms = 350): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), ms))
+export interface NewsItem {
+  id: string
+  title: string
+  url: string
+  source?: string
+  publishedAt: string
+  summary?: string
+  category?: string
+  sentimentLabel?: string
+  sentimentScore?: number
+  impactScore?: number
 }
 
-export async function fetchNews(category?: NewsItem['category'] | 'All'): Promise<NewsItem[]> {
-  if (isBackendConfigured) {
-    const { data } = await apiClient.get<ApiNews[]>('/news', { params: { limit: 50 } })
-    const items = data.map(adaptApiNews)
-    return !category || category === 'All' ? items : items.filter((n) => n.category === category)
+function adaptNews(item: ApiNews): NewsItem {
+  return {
+    id: item.id,
+    title: item.title,
+    url: item.url,
+    source: item.source ?? undefined,
+    publishedAt: item.published_at,
+    summary: item.summary ?? undefined,
+    category: item.category ?? undefined,
+    sentimentLabel: item.sentiment_label ?? undefined,
+    sentimentScore: item.sentiment_score ?? undefined,
+    impactScore: item.impact_score ?? undefined,
   }
+}
 
-  const items =
-    !category || category === 'All' ? MOCK_NEWS : MOCK_NEWS.filter((n) => n.category === category)
-  return delay(items)
+export async function fetchNews(params?: {
+  page?: number
+  pageSize?: number
+  category?: string
+}) {
+  const response = await apiClient.get<{
+    items: ApiNews[]
+    total?: number
+    page?: number
+    page_size?: number
+  }>('/news', {
+    params: {
+      page: params?.page ?? 1,
+      page_size: params?.pageSize ?? 20,
+      category: params?.category || undefined,
+    },
+  })
+
+  return {
+    items: response.data.items.map(adaptNews),
+    total: response.data.total ?? response.data.items.length,
+    page: response.data.page ?? params?.page ?? 1,
+    pageSize:
+      response.data.page_size ??
+      params?.pageSize ??
+      20,
+  }
+}
+
+export async function fetchLatestNews(limit = 10) {
+  const response = await apiClient.get<{
+    items: ApiNews[]
+  }>('/news', {
+    params: {
+      page: 1,
+      page_size: limit,
+    },
+  })
+
+  return response.data.items
+    .map(adaptNews)
+    .slice(0, limit)
 }
