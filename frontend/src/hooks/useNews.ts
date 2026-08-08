@@ -9,9 +9,7 @@ export type NewsCategory =
   | 'RBI Policy'
   | 'Global'
 
-export function useNews(
-  category: NewsCategory = 'All',
-) {
+export function useNews(category: NewsCategory = 'All') {
   return useQuery({
     queryKey: ['news', category],
     queryFn: () =>
