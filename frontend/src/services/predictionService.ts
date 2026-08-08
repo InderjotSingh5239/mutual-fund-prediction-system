@@ -1,5 +1,12 @@
-import type { PredictionHorizon, PredictionResult } from '@/types/fund'
-import type { ApiPredictionListResponse } from '@/types/api'
+import type {
+  PredictionHorizon,
+  PredictionResult,
+} from '@/types/fund'
+
+import type {
+  ApiPredictionListResponse,
+} from '@/types/api'
+
 import { apiClient } from '@/api/client'
 import { adaptApiPrediction } from '@/services/predictionAdapter'
 import { fetchFundById } from '@/services/fundService'
@@ -21,7 +28,7 @@ async function requestPredictionFromApi(
     )
   }
 
-  // Get the latest real NAV from the backend.
+  // Load the latest real NAV for the selected fund.
   const fund = await fetchFundById(fundId)
 
   if (!fund) {
