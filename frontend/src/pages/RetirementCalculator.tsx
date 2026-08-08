@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Calculator, TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react'
+import {TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -83,7 +83,7 @@ export default function RetirementCalculator() {
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-2">
-          <Calculator className="w-6 h-6 text-emerald-500" />
+          <TrendingUp className="w-6 h-6 text-emerald-500" />
           <h1 className="text-2xl font-display font-semibold text-ink-950 dark:text-white">
             Retirement Calculator
           </h1>
@@ -229,7 +229,7 @@ export default function RetirementCalculator() {
                 />
 
                 <ResultCard
-                  icon={<Calculator className="w-5 h-5" />}
+                  icon={<TrendingUp className="w-5 h-5" />}
                   title="Required Corpus"
                   value={formatCurrency(
                     result.required_corpus_at_retirement,
