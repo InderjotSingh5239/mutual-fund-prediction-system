@@ -8,15 +8,13 @@ import type {
 import type {
   ApiMutualFund,
   ApiMutualFundDetail,
-  ApiMutualFundListResponse,
 } from '@/types/api'
 
 import { apiClient } from '@/api/client'
-import { adaptApiFund, adaptApiFundDetail } from '@/services/fundAdapter'
-
-// =====================================================
-// Filters
-// =====================================================
+import {
+  adaptApiFund,
+  adaptApiFundDetail,
+} from '@/services/fundAdapter'
 
 export interface FundFilters {
   search?: string
@@ -30,10 +28,6 @@ export interface FundFilters {
   pageSize?: number
 }
 
-// =====================================================
-// Paginated Response
-// =====================================================
-
 export interface PaginatedFunds {
   funds: MutualFund[]
   total: number
@@ -42,75 +36,120 @@ export interface PaginatedFunds {
   totalPages: number
 }
 
-// =====================================================
-// Fetch Funds
-// =====================================================
+interface ApiFundListResponse {
+  items: ApiMutualFund[]
+  total: number
+  page: number
+  page_size: number
+}
 
+/**
+ * Fetch real mutual-fund data from FastAPI.
+ *
+ * No mock-data fallback is used here.
+ */
 export async function fetchFunds(
   filters: FundFilters = {},
 ): Promise<PaginatedFunds> {
   const page = filters.page ?? 1
-  const pageSize = filters.pageSize ?? 9
+  const pageSize = filters.pageSize ?? 20
 
-  const response = await apiClient.get<ApiMutualFundListResponse>(
-    '/funds',
-    {
-      params: {
-        page,
-        page_size: pageSize,
-        search: filters.search || undefined,
+  const response =
+    await apiClient.get<ApiFundListResponse>(
+      '/funds',
+      {
+        params: {
+          page,
+          page_size: pageSize,
+          search:
+            filters.search?.trim() || undefined,
+          category:
+            filters.category &&
+            filters.category !== 'All'
+              ? filters.category
+              : undefined,
+          amc:
+            filters.amc &&
+            filters.amc !== 'All'
+              ? filters.amc
+              : undefined,
+          risk_level:
+            filters.riskLevel &&
+            filters.riskLevel !== 'All'
+              ? filters.riskLevel
+              : undefined,
+          max_expense_ratio:
+            filters.maxExpenseRatio,
+        },
       },
-    },
-  )
+    )
 
   const data = response.data
 
   let funds = data.items.map(
-    (fund: ApiMutualFund) => adaptApiFund(fund),
+    (fund) => adaptApiFund(fund),
   )
 
-  // ---------------------------------------------------
-  // Client-side filtering for fields not supported
-  // server-side by the current backend
-  // ---------------------------------------------------
+  /*
+   * These filters are retained client-side as a safety
+   * layer in case the deployed backend does not support
+   * every optional query parameter yet.
+   */
 
-  if (filters.category && filters.category !== 'All') {
+  if (
+    filters.category &&
+    filters.category !== 'All'
+  ) {
     funds = funds.filter(
-      (fund) => fund.category === filters.category,
+      (fund) =>
+        fund.category === filters.category,
     )
   }
 
-  if (filters.amc && filters.amc !== 'All') {
+  if (
+    filters.amc &&
+    filters.amc !== 'All'
+  ) {
     funds = funds.filter(
       (fund) => fund.amc === filters.amc,
     )
   }
 
-  if (filters.riskLevel && filters.riskLevel !== 'All') {
-    funds = funds.filter(
-      (fund) => fund.riskLevel === filters.riskLevel,
-    )
-  }
-
-  if (filters.maxExpenseRatio !== undefined) {
+  if (
+    filters.riskLevel &&
+    filters.riskLevel !== 'All'
+  ) {
     funds = funds.filter(
       (fund) =>
-        (fund.expenseRatio ?? 0) <= filters.maxExpenseRatio!,
+        fund.riskLevel === filters.riskLevel,
     )
   }
 
-  // ---------------------------------------------------
-  // Sorting
-  // ---------------------------------------------------
+  if (
+    filters.maxExpenseRatio !== undefined
+  ) {
+    funds = funds.filter(
+      (fund) =>
+        (fund.expenseRatio ?? 0) <=
+        filters.maxExpenseRatio!,
+    )
+  }
 
   if (filters.sortBy) {
-    const sortOrder = filters.sortOrder ?? 'desc'
+    const sortOrder =
+      filters.sortOrder ?? 'desc'
 
     funds = [...funds].sort((a, b) => {
-      const aValue = Number(a[filters.sortBy!]) || 0
-      const bValue = Number(b[filters.sortBy!]) || 0
+      const aValue = Number(
+        a[filters.sortBy!],
+      ) || 0
 
-      const difference = aValue - bValue
+      const bValue = Number(
+        b[filters.sortBy!],
+      ) || 0
+
+      const difference =
+        aValue - bValue
 
       return sortOrder === 'asc'
         ? difference
@@ -125,34 +164,37 @@ export async function fetchFunds(
     pageSize: data.page_size,
     totalPages: Math.max(
       1,
-      Math.ceil(data.total / data.page_size),
+      Math.ceil(
+        data.total / data.page_size,
+      ),
     ),
   }
 }
 
-// =====================================================
-// Fetch Fund By ID
-// =====================================================
-
+/**
+ * Fetch one fund with its complete real
+ * backend detail response.
+ */
 export async function fetchFundById(
   id: string,
 ): Promise<MutualFund | undefined> {
-  try {
-    const response = await apiClient.get<ApiMutualFundDetail>(
-      `/funds/${id}`,
+  if (!id) {
+    return undefined
+  }
+
+  const response =
+    await apiClient.get<ApiMutualFundDetail>(
+      `/funds/${encodeURIComponent(id)}`,
     )
 
-    return adaptApiFundDetail(response.data)
-  } catch (error) {
-    console.error('Failed to fetch fund:', error)
-    throw error
-  }
+  return adaptApiFundDetail(
+    response.data,
+  )
 }
 
-// =====================================================
-// Top Gainers
-// =====================================================
-
+/**
+ * Fetch top gaining funds using real API data.
+ */
 export async function fetchTopGainers(
   limit = 5,
 ): Promise<MutualFund[]> {
@@ -170,10 +212,9 @@ export async function fetchTopGainers(
     .slice(0, limit)
 }
 
-// =====================================================
-// Top Losers
-// =====================================================
-
+/**
+ * Fetch top losing funds using real API data.
+ */
 export async function fetchTopLosers(
   limit = 5,
 ): Promise<MutualFund[]> {
@@ -191,34 +232,43 @@ export async function fetchTopLosers(
     .slice(0, limit)
 }
 
-// =====================================================
-// Trending Funds
-// =====================================================
-
+/**
+ * Fetch trending funds from the real backend.
+ *
+ * If the dedicated trending endpoint is unavailable,
+ * use the real /funds response and rank by CAGR.
+ * No dummy data is introduced.
+ */
 export async function fetchTrendingFunds(
   limit = 6,
 ): Promise<MutualFund[]> {
   try {
-    const response = await apiClient.get<{
-      items: ApiMutualFund[]
-    }>('/funds/trending', {
-      params: { limit },
-    })
+    const response =
+      await apiClient.get<{
+        items: ApiMutualFund[]
+      }>(
+        '/funds/trending',
+        {
+          params: { limit },
+        },
+      )
 
     return response.data.items
-      .map((fund) => adaptApiFund(fund))
+      .map((fund) =>
+        adaptApiFund(fund),
+      )
       .slice(0, limit)
   } catch (error) {
-    console.error(
-      'Trending endpoint unavailable:',
+    console.warn(
+      'Trending endpoint unavailable. Using real /funds data.',
       error,
     )
 
-    // Use real /funds data instead of mock data.
-    const { funds } = await fetchFunds({
-      page: 1,
-      pageSize: 100,
-    })
+    const { funds } =
+      await fetchFunds({
+        page: 1,
+        pageSize: 100,
+      })
 
     return [...funds]
       .sort(
