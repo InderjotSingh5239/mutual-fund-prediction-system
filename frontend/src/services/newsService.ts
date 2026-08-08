@@ -1,74 +1,127 @@
-import type { ApiNews } from '@/types/api'
 import { apiClient } from '@/api/client'
+
+export type NewsCategory =
+  | 'Markets'
+  | 'Mutual Funds'
+  | 'Economy'
+  | 'RBI Policy'
+  | 'Global'
+
+export type NewsSentiment =
+  | 'Neutral'
+  | 'Positive'
+  | 'Negative'
 
 export interface NewsItem {
   id: string
   title: string
-  url: string
-  source?: string
-  publishedAt: string
   summary?: string
+  source?: string
   category?: string
-  sentimentLabel?: string
-  sentimentScore?: number
-  impactScore?: number
+  sentimentLabel?: NewsSentiment
+  publishedAt?: string
+  url?: string
 }
 
-function adaptNews(item: ApiNews): NewsItem {
+export interface NewsResponse {
+  items: NewsItem[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+interface ApiNewsItem {
+  id: string | number
+  title?: string
+  headline?: string
+  summary?: string | null
+  source?: string | null
+  category?: string | null
+  sentiment?: string | null
+  sentiment_label?: string | null
+  published_at?: string | null
+  publishedAt?: string | null
+  url?: string | null
+  article_url?: string | null
+}
+
+interface ApiNewsResponse {
+  items?: ApiNewsItem[]
+  total?: number
+  page?: number
+  page_size?: number
+}
+
+function normalizeSentiment(
+  value?: string | null,
+): NewsSentiment {
+  if (!value) return 'Neutral'
+
+  const normalized = value.toLowerCase()
+
+  if (normalized.includes('positive')) {
+    return 'Positive'
+  }
+
+  if (normalized.includes('negative')) {
+    return 'Negative'
+  }
+
+  return 'Neutral'
+}
+
+function adaptNewsItem(
+  item: ApiNewsItem,
+): NewsItem {
   return {
-    id: item.id,
-    title: item.title,
-    url: item.url,
-    source: item.source ?? undefined,
-    publishedAt: item.published_at,
+    id: String(item.id),
+    title: item.title ?? item.headline ?? 'Market Update',
     summary: item.summary ?? undefined,
+    source: item.source ?? undefined,
     category: item.category ?? undefined,
-    sentimentLabel: item.sentiment_label ?? undefined,
-    sentimentScore: item.sentiment_score ?? undefined,
-    impactScore: item.impact_score ?? undefined,
+    sentimentLabel: normalizeSentiment(
+      item.sentiment_label ?? item.sentiment,
+    ),
+    publishedAt:
+      item.published_at ??
+      item.publishedAt ??
+      undefined,
+    url:
+      item.article_url ??
+      item.url ??
+      undefined,
   }
 }
 
-export async function fetchNews(params?: {
+export async function fetchNews(params: {
   page?: number
   pageSize?: number
   category?: string
-}) {
-  const response = await apiClient.get<{
-    items: ApiNews[]
-    total?: number
-    page?: number
-    page_size?: number
-  }>('/news', {
-    params: {
-      page: params?.page ?? 1,
-      page_size: params?.pageSize ?? 20,
-      category: params?.category || undefined,
+} = {}): Promise<NewsResponse> {
+  const page = params.page ?? 1
+  const pageSize = params.pageSize ?? 20
+
+  const response = await apiClient.get<ApiNewsResponse>(
+    '/news',
+    {
+      params: {
+        page,
+        page_size: pageSize,
+        category: params.category || undefined,
+      },
     },
-  })
+  )
+
+  const data = response.data
+
+  const items = (data.items ?? []).map(
+    adaptNewsItem,
+  )
 
   return {
-    items: response.data.items.map(adaptNews),
-    total: response.data.total ?? response.data.items.length,
-    page: response.data.page ?? params?.page ?? 1,
-    pageSize:
-      response.data.page_size ??
-      params?.pageSize ??
-      20,
+    items,
+    total: data.total ?? items.length,
+    page: data.page ?? page,
+    pageSize: data.page_size ?? pageSize,
   }
-}
-
-export async function fetchLatestNews(limit = 10) {
-  const response = await apiClient.get<{
-    items: ApiNews[]
-  }>('/news', {
-    params: {
-      page: 1,
-      page_size: limit,
-    },
-  })
-
-  return response.data.items
-    .map(adaptNews)
-    .slice(0, limit)
 }
