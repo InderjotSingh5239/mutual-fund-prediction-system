@@ -18,10 +18,7 @@ export function useNews(
       fetchNews({
         page: 1,
         pageSize: 20,
-        category:
-          category === 'All'
-            ? undefined
-            : category,
+        category: category === 'All' ? undefined : category,
       }),
   })
 }
