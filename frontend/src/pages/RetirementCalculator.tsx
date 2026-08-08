@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react'
+import { Calculator, TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react'
 import {
   Card,
   CardContent,
