@@ -13,34 +13,62 @@ export class PredictionNotAvailableError extends Error {
 
 async function requestPredictionFromApi(
   fundId: string,
-  horizon: PredictionHorizon
+  horizon: PredictionHorizon,
 ): Promise<PredictionResult> {
+  if (!fundId) {
+    throw new PredictionNotAvailableError(
+      'A valid fund ID is required for prediction.',
+    )
+  }
+
+  // Get the latest real NAV from the backend.
   const fund = await fetchFundById(fundId)
-  const currentNav = fund?.nav ?? 0
+
+  if (!fund) {
+    throw new PredictionNotAvailableError(
+      'Fund information could not be loaded.',
+    )
+  }
+
+  const currentNav = fund.nav
+
+  if (currentNav == null || !Number.isFinite(currentNav)) {
+    throw new PredictionNotAvailableError(
+      'Current NAV is not available for this fund.',
+    )
+  }
 
   let data: ApiPredictionListResponse
 
   try {
     const response = await apiClient.get<ApiPredictionListResponse>(
-      `/predictions/${fundId}`
+      `/predictions/${encodeURIComponent(fundId)}`,
     )
 
     data = response.data
-  } catch (err) {
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new PredictionNotAvailableError(error.message)
+    }
+
     throw new PredictionNotAvailableError(
-      err instanceof Error
-        ? err.message
-        : 'Predictions are not yet available for this fund.'
+      'Predictions are not yet available for this fund.',
+    )
+  }
+
+  if (!data || !Array.isArray(data.predictions)) {
+    throw new PredictionNotAvailableError(
+      'Invalid prediction response received from the backend.',
     )
   }
 
   const match = data.predictions.find(
-    (prediction) => prediction.horizon_days === horizon
+    (prediction) => prediction.horizon_days === horizon,
   )
 
   if (!match) {
     throw new PredictionNotAvailableError(
-      `No ${horizon}-day prediction has been generated for this fund yet.`
+      `No ${horizon}-day prediction has been generated for this fund yet.`,
     )
   }
 
@@ -52,7 +80,7 @@ async function requestPredictionFromApi(
 
 export async function requestPrediction(
   fundId: string,
-  horizon: PredictionHorizon
+  horizon: PredictionHorizon,
 ): Promise<PredictionResult> {
   return requestPredictionFromApi(fundId, horizon)
 }
