@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Calculator,
   TrendingUp,
   ShieldAlert,
   BarChart3,
