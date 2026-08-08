@@ -1,4 +1,4 @@
-import { apiClient } from '@/services/api'
+import { apiClient } from '@/api/client'
 import type {
   ApiRetirementResponse,
   ApiMonteCarloResponse
