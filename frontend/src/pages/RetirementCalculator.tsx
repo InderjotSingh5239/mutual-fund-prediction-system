@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Calculator, TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { TrendingUp, ShieldCheck, AlertTriangle } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
 import { formatCurrency } from '@/lib/utils'
 import { calculateRetirement } from '@/services/calculatorService'
 import type { ApiRetirementResponse } from '@/types/api'
@@ -14,15 +20,22 @@ export default function RetirementCalculator() {
   const [stepUp, setStepUp] = useState(5)
   const [annualExpense, setAnnualExpense] = useState(600000)
   const [inflation, setInflation] = useState(6)
-  const [lifeExpectancy, setLifeExpectancy] = useState(85)
+  const [lifeExpectancy, setLifeExpectancy] = useState(80)
 
   const [result, setResult] = useState<ApiRetirementResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (retirementAge <= currentAge || lifeExpectancy <= retirementAge) {
+    if (retirementAge <= currentAge) {
       setResult(null)
+      setError('Retirement age must be greater than current age.')
+      return
+    }
+
+    if (lifeExpectancy <= retirementAge) {
+      setResult(null)
+      setError('Life expectancy must be greater than retirement age.')
       return
     }
 
@@ -45,9 +58,9 @@ export default function RetirementCalculator() {
 
         setResult(response)
       } catch (err) {
-        console.error(err)
-        setError('Unable to calculate retirement projection.')
+        console.error('Retirement calculator error:', err)
         setResult(null)
+        setError('Unable to calculate retirement projection.')
       } finally {
         setLoading(false)
       }
@@ -69,16 +82,15 @@ export default function RetirementCalculator() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Calculator className="w-6 h-6 text-emerald-500" />
-          <h1 className="text-2xl font-semibold text-ink-950 dark:text-white">
+          <h1 className="text-2xl font-display font-semibold text-ink-950 dark:text-white">
             Retirement Calculator
           </h1>
         </div>
 
         <p className="mt-1 text-sm text-ink-500 dark:text-paper-200/60">
-          Estimate your retirement corpus and determine whether your current
-          investment strategy is sufficient.
+          Estimate whether your investments can support your retirement goals.
         </p>
       </div>
 
@@ -87,50 +99,50 @@ export default function RetirementCalculator() {
           <CardHeader>
             <CardTitle>Retirement Inputs</CardTitle>
             <CardDescription>
-              Adjust your financial assumptions
+              Adjust your financial assumptions.
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-5">
-            <NumberInput
+            <InputField
               label="Current Age"
               value={currentAge}
               min={18}
-              max={retirementAge - 1}
+              max={70}
               step={1}
               onChange={setCurrentAge}
             />
 
-            <NumberInput
+            <InputField
               label="Retirement Age"
               value={retirementAge}
-              min={currentAge + 1}
-              max={lifeExpectancy - 1}
+              min={30}
+              max={80}
               step={1}
               onChange={setRetirementAge}
             />
 
-            <NumberInput
+            <InputField
               label="Current Savings"
               value={currentSavings}
               min={0}
               max={100000000}
               step={5000}
               onChange={setCurrentSavings}
-              currency
+              formatCurrencyValue
             />
 
-            <NumberInput
+            <InputField
               label="Monthly Investment"
               value={monthlyInvestment}
-              min={0}
+              min={500}
               max={1000000}
               step={500}
               onChange={setMonthlyInvestment}
-              currency
+              formatCurrencyValue
             />
 
-            <NumberInput
+            <InputField
               label="Expected Annual Return"
               value={annualReturn}
               min={1}
@@ -140,8 +152,8 @@ export default function RetirementCalculator() {
               suffix="%"
             />
 
-            <NumberInput
-              label="Annual Step-up"
+            <InputField
+              label="Annual Step-Up"
               value={stepUp}
               min={0}
               max={30}
@@ -150,31 +162,31 @@ export default function RetirementCalculator() {
               suffix="%"
             />
 
-            <NumberInput
-              label="Post-retirement Annual Expense"
+            <InputField
+              label="Annual Retirement Expense"
               value={annualExpense}
-              min={0}
+              min={10000}
               max={10000000}
               step={10000}
               onChange={setAnnualExpense}
-              currency
+              formatCurrencyValue
             />
 
-            <NumberInput
+            <InputField
               label="Inflation"
               value={inflation}
               min={0}
-              max={20}
+              max={15}
               step={0.5}
               onChange={setInflation}
               suffix="%"
             />
 
-            <NumberInput
+            <InputField
               label="Life Expectancy"
               value={lifeExpectancy}
               min={retirementAge + 1}
-              max={120}
+              max={100}
               step={1}
               onChange={setLifeExpectancy}
             />
@@ -182,34 +194,21 @@ export default function RetirementCalculator() {
         </Card>
 
         <div className="lg:col-span-2 space-y-6">
+          {error && (
+            <Card>
+              <CardContent className="p-5 flex items-center gap-3 text-red-600">
+                <AlertTriangle className="w-5 h-5" />
+                <p className="text-sm">{error}</p>
+              </CardContent>
+            </Card>
+          )}
+
           {loading && (
             <Card>
               <CardContent className="p-8 text-center">
-                Calculating retirement projection...
-              </CardContent>
-            </Card>
-          )}
-
-          {error && (
-            <Card>
-              <CardContent className="p-8 text-center text-red-500">
-                {error}
-              </CardContent>
-            </Card>
-          )}
-
-          {retirementAge <= currentAge && (
-            <Card>
-              <CardContent className="p-8 text-center text-amber-600">
-                Retirement age must be greater than current age.
-              </CardContent>
-            </Card>
-          )}
-
-          {lifeExpectancy <= retirementAge && (
-            <Card>
-              <CardContent className="p-8 text-center text-amber-600">
-                Life expectancy must be greater than retirement age.
+                <p className="text-sm text-ink-500">
+                  Calculating retirement projection...
+                </p>
               </CardContent>
             </Card>
           )}
@@ -218,36 +217,27 @@ export default function RetirementCalculator() {
             <>
               <div className="grid sm:grid-cols-2 gap-4">
                 <ResultCard
+                  icon={<TrendingUp className="w-5 h-5" />}
                   title="Years to Retirement"
                   value={`${result.years_to_retirement} years`}
-                  icon={<TrendingUp className="w-5 h-5" />}
                 />
 
                 <ResultCard
+                  icon={<ShieldCheck className="w-5 h-5" />}
                   title="Corpus at Retirement"
                   value={formatCurrency(result.corpus_at_retirement, true)}
-                  icon={<TrendingUp className="w-5 h-5" />}
                 />
 
                 <ResultCard
+                  icon={<Calculator className="w-5 h-5" />}
                   title="Required Corpus"
                   value={formatCurrency(
                     result.required_corpus_at_retirement,
                     true
                   )}
-                  icon={<Calculator className="w-5 h-5" />}
                 />
 
                 <ResultCard
-                  title={
-                    result.corpus_sufficient
-                      ? 'Surplus'
-                      : 'Shortfall'
-                  }
-                  value={formatCurrency(
-                    Math.abs(result.shortfall_or_surplus),
-                    true
-                  )}
                   icon={
                     result.corpus_sufficient ? (
                       <ShieldCheck className="w-5 h-5" />
@@ -255,59 +245,78 @@ export default function RetirementCalculator() {
                       <AlertTriangle className="w-5 h-5" />
                     )
                   }
-                  positive={result.corpus_sufficient}
+                  title={result.corpus_sufficient ? 'Status' : 'Shortfall'}
+                  value={
+                    result.corpus_sufficient
+                      ? 'Goal Achievable'
+                      : formatCurrency(
+                          Math.abs(result.shortfall_or_surplus),
+                          true
+                        )
+                  }
                 />
               </div>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>
-                    Retirement Readiness
-                  </CardTitle>
+                  <CardTitle>Retirement Analysis</CardTitle>
                   <CardDescription>
-                    Based on the assumptions provided
+                    Based on the assumptions provided above.
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-5">
-                  <div
-                    className={`rounded-lg border p-5 ${
-                      result.corpus_sufficient
-                        ? 'border-emerald-500/30'
-                        : 'border-amber-500/30'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {result.corpus_sufficient ? (
-                        <ShieldCheck className="w-6 h-6 text-emerald-500" />
-                      ) : (
-                        <AlertTriangle className="w-6 h-6 text-amber-500" />
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between border-b pb-3">
+                    <span className="text-sm text-ink-500">
+                      Years to retirement
+                    </span>
+                    <strong>{result.years_to_retirement}</strong>
+                  </div>
+
+                  <div className="flex justify-between border-b pb-3">
+                    <span className="text-sm text-ink-500">
+                      Projected retirement corpus
+                    </span>
+                    <strong>
+                      {formatCurrency(result.corpus_at_retirement, true)}
+                    </strong>
+                  </div>
+
+                  <div className="flex justify-between border-b pb-3">
+                    <span className="text-sm text-ink-500">
+                      Required retirement corpus
+                    </span>
+                    <strong>
+                      {formatCurrency(
+                        result.required_corpus_at_retirement,
+                        true
                       )}
+                    </strong>
+                  </div>
 
-                      <div>
-                        <p className="font-semibold text-ink-950 dark:text-white">
-                          {result.corpus_sufficient
-                            ? 'Your projected corpus is sufficient'
-                            : 'Your projected corpus may be insufficient'}
-                        </p>
-
-                        <p className="text-sm text-ink-500 dark:text-paper-200/60">
-                          {result.corpus_sufficient
-                            ? 'Your current investment strategy is projected to cover the estimated retirement requirement.'
-                            : 'Consider increasing your monthly investment or reviewing your retirement assumptions.'}
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex justify-between border-b pb-3">
+                    <span className="text-sm text-ink-500">
+                      Surplus / Shortfall
+                    </span>
+                    <strong
+                      className={
+                        result.shortfall_or_surplus >= 0
+                          ? 'text-emerald-600'
+                          : 'text-red-600'
+                      }
+                    >
+                      {formatCurrency(result.shortfall_or_surplus, true)}
+                    </strong>
                   </div>
 
                   {!result.corpus_sufficient &&
                     result.monthly_investment_needed_if_shortfall !== null && (
-                      <div className="rounded-lg bg-amber-500/10 p-5">
-                        <p className="text-sm text-ink-500 dark:text-paper-200/60">
-                          Estimated additional monthly investment required
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 p-4">
+                        <p className="text-sm text-amber-700 dark:text-amber-400">
+                          Additional monthly investment required
                         </p>
 
-                        <p className="mt-1 text-2xl font-semibold text-amber-600">
+                        <p className="text-2xl font-semibold mt-1">
                           {formatCurrency(
                             result.monthly_investment_needed_if_shortfall,
                             true
@@ -316,36 +325,14 @@ export default function RetirementCalculator() {
                       </div>
                     )}
 
-                  <div className="grid sm:grid-cols-2 gap-4 text-sm">
-                    <InfoRow
-                      label="Projected Corpus"
-                      value={formatCurrency(
-                        result.corpus_at_retirement,
-                        true
-                      )}
-                    />
-
-                    <InfoRow
-                      label="Required Corpus"
-                      value={formatCurrency(
-                        result.required_corpus_at_retirement,
-                        true
-                      )}
-                    />
-
-                    <InfoRow
-                      label="Retirement Period"
-                      value={`${Math.max(
-                        0,
-                        lifeExpectancy - retirementAge
-                      )} years`}
-                    />
-
-                    <InfoRow
-                      label="Years Remaining"
-                      value={`${result.years_to_retirement} years`}
-                    />
-                  </div>
+                  {result.corpus_sufficient && (
+                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/20 p-4">
+                      <p className="text-sm text-emerald-700 dark:text-emerald-400">
+                        Your projected retirement corpus is sufficient under
+                        the assumptions provided.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </>
@@ -356,15 +343,15 @@ export default function RetirementCalculator() {
   )
 }
 
-function NumberInput({
+function InputField({
   label,
   value,
   min,
   max,
   step,
   onChange,
-  currency = false,
-  suffix = '',
+  suffix,
+  formatCurrencyValue = false,
 }: {
   label: string
   value: number
@@ -372,18 +359,20 @@ function NumberInput({
   max: number
   step: number
   onChange: (value: number) => void
-  currency?: boolean
   suffix?: string
+  formatCurrencyValue?: boolean
 }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-ink-950 dark:text-white">
+        <label className="text-sm font-medium text-ink-900 dark:text-white">
           {label}
         </label>
 
-        <span className="text-xs text-ink-500 dark:text-paper-200/50">
-          {currency ? formatCurrency(value, true) : `${value}${suffix}`}
+        <span className="text-sm text-ink-500 dark:text-paper-200/60">
+          {formatCurrencyValue
+            ? formatCurrency(value, true)
+            : `${value}${suffix ?? ''}`}
         </span>
       </div>
 
@@ -393,67 +382,42 @@ function NumberInput({
         min={min}
         max={max}
         step={step}
-        onChange={(e) => {
-          const next = Number(e.target.value)
-          if (!Number.isNaN(next)) {
-            onChange(next)
+        onChange={(event) => {
+          const nextValue = Number(event.target.value)
+
+          if (!Number.isNaN(nextValue)) {
+            onChange(nextValue)
           }
         }}
-        className="w-full rounded-md border border-ink-950/10 dark:border-white/10 bg-transparent p-2.5"
+        className="w-full rounded-md border border-ink-950/10 dark:border-white/10 bg-white dark:bg-ink-900 p-2 text-sm"
       />
     </div>
   )
 }
 
 function ResultCard({
+  icon,
   title,
   value,
-  icon,
-  positive = true,
 }: {
+  icon: React.ReactNode
   title: string
   value: string
-  icon: React.ReactNode
-  positive?: boolean
 }) {
   return (
     <Card>
       <CardContent className="p-5">
-        <div className="flex items-center gap-2 text-ink-500 dark:text-paper-200/50">
+        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
           {icon}
-          <p className="text-xs uppercase">{title}</p>
+          <span className="text-xs uppercase text-ink-500 dark:text-paper-200/50">
+            {title}
+          </span>
         </div>
 
-        <p
-          className={`mt-2 text-2xl font-semibold ${
-            positive
-              ? 'text-emerald-600 dark:text-emerald-400'
-              : 'text-amber-600'
-          }`}
-        >
+        <p className="mt-2 text-2xl font-mono-data font-semibold text-ink-950 dark:text-white">
           {value}
         </p>
       </CardContent>
     </Card>
-  )
-}
-
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex justify-between border-b border-ink-950/5 dark:border-white/5 pb-2">
-      <span className="text-ink-500 dark:text-paper-200/50">
-        {label}
-      </span>
-
-      <span className="font-medium text-ink-950 dark:text-white">
-        {value}
-      </span>
-    </div>
   )
 }
