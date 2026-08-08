@@ -1,7 +1,27 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchNews } from '@/services/newsService'
-import type { NewsItem } from '@/data/mockNews'
 
-export function useNews(category?: NewsItem['category'] | 'All') {
-  return useQuery({ queryKey: ['news', category], queryFn: () => fetchNews(category) })
+export type NewsCategory =
+  | 'All'
+  | 'Markets'
+  | 'Mutual Funds'
+  | 'Economy'
+  | 'RBI Policy'
+  | 'Global'
+
+export function useNews(
+  category: NewsCategory = 'All',
+) {
+  return useQuery({
+    queryKey: ['news', category],
+    queryFn: () =>
+      fetchNews({
+        page: 1,
+        pageSize: 20,
+        category:
+          category === 'All'
+            ? undefined
+            : category,
+      }),
+  })
 }
